@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cloud Task Analysis Dashboard</title>
+  
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Chart.js gradient plugin -->
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-gradient"></script>
+  
+  <style>
+    :root {
+      --primary: #6c5ce7;
+      --secondary: #a29bfe;
+      --dark: #1a1a2e;
+      --light: #f5f6fa;
+      --cyber-blue: #00f5ff;
+      --cyber-purple: #bc13fe;
+      --success: #00b894;
+      --warning: #fdcb6e;
+      --danger: #d63031;
+    }
+    
+    body {
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      color: white;
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+      background-attachment: fixed;
+    }
+    
+    .dashboard-container {
+      background: rgba(26, 26, 46, 0.85);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+    
+    .card {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 15px;
+      backdrop-filter: blur(5px);
+      transition: all 0.3s ease;
+      height: 100%;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+      border-color: var(--cyber-blue);
+    }
+    
+    .card-header {
+      background: rgba(0, 0, 0, 0.2);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      font-family: 'Orbitron', sans-serif;
+      letter-spacing: 1px;
+      color: var(--cyber-blue);
+    }
+    
+    .chart-container {
+      position: relative;
+      height: 300px;
+      padding: 15px;
+    }
+    
+    /* Task Input Forms */
+    .task-form-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin: 2rem 0;
+    }
+    
+    .task-form {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 1.5rem;
+      border: 1px solid rgba(108, 92, 231, 0.3);
+      position: relative;
+    }
+    
+    .task-number {
+      position: absolute;
+      top: -10px;
+      left: 15px;
+      background: var(--cyber-purple);
+      color: white;
+      padding: 0 10px;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+    
+    .form-control {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+    }
+    
+    .form-control:focus {
+      background: rgba(0, 0, 0, 0.5);
+      border-color: var(--cyber-blue);
+      box-shadow: 0 0 0 0.25rem rgba(108, 92, 231, 0.25);
+      color: white;
+    }
+    
+    /* Range Input Styling */
+    .form-range {
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .form-range::-webkit-slider-thumb {
+      width: 18px;
+      height: 18px;
+      background: var(--cyber-blue);
+      border: none;
+    }
+    
+    .range-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 5px;
+    }
+    
+    .range-labels small {
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.6);
+    }
+    
+    /* Buttons */
+    .btn-analyze {
+      background: linear-gradient(45deg, var(--cyber-purple), var(--primary));
+      border: none;
+      padding: 12px 30px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      border-radius: 50px;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      box-shadow: 0 4px 15px rgba(188, 19, 254, 0.3);
+    }
+    
+    .btn-analyze:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(188, 19, 254, 0.4);
+      background: linear-gradient(45deg, var(--primary), var(--cyber-purple));
+    }
+    
+    /* Results */
+    .result-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-top: 2rem;
+    }
+    
+    .result-card {
+      border-radius: 10px;
+      padding: 1.5rem;
+      text-align: center;
+      transition: all 0.3s ease;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid transparent;
+    }
+    
+    .result-card:hover {
+      transform: scale(1.03);
+    }
+    
+    .priority-1 { border-color: rgba(255, 99, 132, 0.7); background: rgba(255, 99, 132, 0.15); }
+    .priority-2 { border-color: rgba(54, 162, 235, 0.7); background: rgba(54, 162, 235, 0.15); }
+    .priority-3 { border-color: rgba(255, 206, 86, 0.7); background: rgba(255, 206, 86, 0.15); }
+    .priority-4 { border-color: rgba(75, 192, 192, 0.7); background: rgba(75, 192, 192, 0.15); }
+    .priority-5 { border-color: rgba(153, 102, 255, 0.7); background: rgba(153, 102, 255, 0.15); }
+    
+    /* Stats cards */
+    .stat-card {
+      border-radius: 10px;
+      padding: 1.5rem;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--cyber-blue);
+    }
+    
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin: 10px 0;
+      background: linear-gradient(45deg, var(--cyber-blue), var(--cyber-purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    /* Animation */
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(188, 19, 254, 0.4); }
+      70% { box-shadow: 0 0 0 10px rgba(188, 19, 254, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(188, 19, 254, 0); }
+    }
+    
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .dashboard-container {
+        padding: 1rem;
+      }
+      
+      .task-form-container {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    /* Glow effect for charts */
+    .chart-glow {
+      filter: drop-shadow(0 0 8px rgba(0, 245, 255, 0.5));
+    }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: var(--cyber-blue);
+      border-radius: 4px;
+    }
+    
+    /* Task type badges */
+    .task-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-right: 5px;
+    }
+    
+    .badge-compute { background: rgba(0, 245, 255, 0.2); color: var(--cyber-blue); }
+    .badge-storage { background: rgba(188, 19, 254, 0.2); color: var(--cyber-purple); }
+    .badge-network { background: rgba(0, 184, 148, 0.2); color: var(--success); }
+    .badge-memory { background: rgba(253, 203, 110, 0.2); color: var(--warning); }
+    
+    /* Parameter label styling */
+    .parameter-label {
+      font-weight: 600;
+      color: var(--cyber-blue);
+      margin-bottom: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .parameter-label small {
+      font-weight: normal;
+      color: rgba(255, 255, 255, 0.6);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="py-4">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <h1 class="mb-0"><i class="fas fa-cloud me-2"></i>Cloud Task Scheduling Dashboard</h1>
+        </div>
+        <div class="col-md-6 text-md-end">
+          <a href="/predict" class="btn btn-outline-primary me-2"><i class="fas fa-robot me-1"></i> Predict</a>
+          <a href="/logout" class="btn btn-outline-danger"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="container my-5">
+    <div class="dashboard-container">
+      <!-- Stats Overview -->
+      <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+          <div class="stat-card">
+            <h5><i class="fas fa-tasks me-2"></i>Total Tasks</h5>
+            <div class="stat-value" id="totalTasks">0</div>
+            <p class="text-muted">Across all priorities</p>
+          </div>
+        </div>
+        <div class="col-md-3 mb-3">
+          <div class="stat-card">
+            <h5><i class="fas fa-clock me-2"></i>Avg Time</h5>
+            <div class="stat-value" id="avgTime">0</div>
+            <p class="text-muted">Execution time (ms)</p>
+          </div>
+        </div>
+        <div class="col-md-3 mb-3">
+          <div class="stat-card">
+            <h5><i class="fas fa-bolt me-2"></i>SLA Critical</h5>
+            <div class="stat-value" id="slaCritical">0%</div>
+            <p class="text-muted">Time-sensitive tasks</p>
+          </div>
+        </div>
+        <div class="col-md-3 mb-3">
+          <div class="stat-card">
+            <h5><i class="fas fa-layer-group me-2"></i>Priority Levels</h5>
+            <div class="stat-value">5</div>
+            <p class="text-muted">From 1 (high) to 5 (low)</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Dashboard -->
+      <div class="row">
+        <!-- Task Input Forms -->
+        <div class="col-lg-5 mb-4">
+          <div class="card h-100">
+            <div class="card-header">
+              <h3 class="mb-0"><i class="fas fa-edit me-2"></i>Task Parameters</h3>
+            </div>
+            <div class="card-body">
+              <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>Please enter values within the specified ranges for accurate analysis
+              </div>
+              
+              <div class="task-form-container" id="taskForms">
+                <!-- Forms will be generated by JavaScript -->
+              </div>
+              
+              <div class="text-center mt-3">
+                <button id="analyzeBtn" class="btn btn-analyze pulse">
+                  <i class="fas fa-bolt me-2"></i>Analyze Tasks
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Results and Priority Distribution -->
+        <div class="col-lg-7 mb-4">
+          <div class="card h-100">
+            <div class="card-header">
+              <h3 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Analysis Results</h3>
+            </div>
+            <div class="card-body">
+              <div class="result-container" id="resultContainer">
+                <!-- Results will appear here -->
+                <div class="text-center py-5">
+                  <i class="fas fa-cloud fa-3x mb-3" style="color: rgba(255,255,255,0.1);"></i>
+                  <p>Submit task parameters to see analysis results</p>
+                </div>
+              </div>
+              <div class="chart-container mt-4">
+                <canvas id="priorityChart" class="chart-glow"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Visualization Row 1 -->
+      <div class="row mt-4">
+        <div class="col-md-6 mb-4">
+          <div class="card h-100">
+            <div class="card-header">
+              <h3 class="mb-0"><i class="fas fa-chart-line me-2"></i>Execution Time Analysis</h3>
+            </div>
+            <div class="card-body">
+              <div class="chart-container">
+                <canvas id="executionTimeChart" class="chart-glow"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 mb-4">
+          <div class="card h-100">
+            <div class="card-header">
+              <h3 class="mb-0"><i class="fas fa-project-diagram me-2"></i>Resource Requirements</h3>
+            </div>
+            <div class="card-body">
+              <div class="chart-container">
+                <canvas id="resourceChart" class="chart-glow"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Visualization Row 2 -->
+      <div class="row mt-2">
+        <div class="col-md-6 mb-4">
+          <div class="card h-100">
+            <div class="card-header">
+              <h3 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Task Type Distribution</h3>
+            </div>
+            <div class="card-body">
+              <div class="chart-container">
+                <canvas id="taskTypeChart" class="chart-glow"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 mb-4">
+          <div class="card h-100">
+            <div class="card-header">
+              <h3 class="mb-0"><i class="fas fa-network-wired me-2"></i>Data Transfer Analysis</h3>
+            </div>
+            <div class="card-body">
+              <div class="chart-container">
+                <canvas id="dataTransferChart" class="chart-glow"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="py-4 text-center">
+    <div class="container">
+      <p class="mb-0">Cloud Task Scheduling System &copy; 2023</p>
+    </div>
+  </footer>
+
+  <!-- JavaScript -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Task parameters configuration
+    const taskParameters = [
+      {
+        id: 'execution_time',
+        label: 'Execution Time',
+        unit: 'ms',
+        min: 10,
+        max: 10000,
+        step: 10,
+        default: 500,
+        description: 'Time needed to complete the task (10-10,000ms)'
+      },
+      {
+        id: 'cpu_req',
+        label: 'CPU Cores',
+        unit: 'cores',
+        min: 1,
+        max: 16,
+        step: 1,
+        default: 4,
+        description: 'Processing power required (1-16 cores)'
+      },
+      {
+        id: 'memory_req',
+        label: 'Memory',
+        unit: 'MB',
+        min: 100,
+        max: 16384,
+        step: 100,
+        default: 2048,
+        description: 'RAM required (100-16,384MB)'
+      },
+      {
+        id: 'storage_req',
+        label: 'Storage',
+        unit: 'MB',
+        min: 100,
+        max: 10240,
+        step: 100,
+        default: 1000,
+        description: 'Disk space needed (100-10,240MB)'
+      },
+      {
+        id: 'data_transfer_size',
+        label: 'Data Transfer',
+        unit: 'MB',
+        min: 0,
+        max: 1024,
+        step: 10,
+        default: 100,
+        description: 'Network data to transfer (0-1,024MB)'
+      }
+    ];
+
+    // Initialize task forms with clear range indicators
+    function initializeTaskForms() {
+      const container = document.getElementById('taskForms');
+      container.innerHTML = '';
+      
+      for (let i = 1; i <= 3; i++) {
+        const form = document.createElement('div');
+        form.className = 'task-form';
+        
+        // Add task number badge
+        const taskNumber = document.createElement('div');
+        taskNumber.className = 'task-number';
+        taskNumber.textContent = `Task ${i}`;
+        form.appendChild(taskNumber);
+        
+        let formHTML = `
+          <h5 class="text-center mb-3">
+            <i class="fas fa-server me-2"></i>Task Parameters
+          </h5>
+        `;
+        
+        taskParameters.forEach(param => {
+          formHTML += `
+            <div class="mb-3">
+              <div class="parameter-label">
+                <span>${param.label}</span>
+                <small>${param.min}-${param.max} ${param.unit}</small>
+              </div>
+              <input type="number" 
+                     class="form-control" 
+                     id="${param.id}_${i}" 
+                     min="${param.min}" 
+                     max="${param.max}" 
+                     step="${param.step}"
+                     value="${param.default}"
+                     placeholder="${param.min}-${param.max} ${param.unit}"
+                     aria-describedby="${param.id}_${i}_help">
+              <small id="${param.id}_${i}_help" class="form-text text-muted">
+                ${param.description}
+              </small>
+              <div class="range-labels d-flex justify-content-between mt-1">
+                <small>${param.min} ${param.unit}</small>
+                <small>${param.max} ${param.unit}</small>
+              </div>
+              <input type="range" 
+                     class="form-range mt-1" 
+                     min="${param.min}" 
+                     max="${param.max}" 
+                     step="${param.step}"
+                     value="${param.default}"
+                     id="${param.id}_${i}_range"
+                     oninput="document.getElementById('${param.id}_${i}').value = this.value">
+            </div>
+          `;
+        });
+        
+        form.innerHTML += formHTML;
+        container.appendChild(form);
+        
+        // Add event listeners for number inputs to update range sliders
+        taskParameters.forEach(param => {
+          const input = form.querySelector(`#${param.id}_${i}`);
+          const range = form.querySelector(`#${param.id}_${i}_range`);
+          
+          input.addEventListener('input', function() {
+            let value = parseFloat(this.value);
+            if (isNaN(value)) value = param.min;
+            if (value > param.max) value = param.max;
+            if (value < param.min) value = param.min;
+            this.value = value;
+            range.value = value;
+          });
+        });
+      }
+    }
+
+    // Load stats from backend
+    async function loadStats() {
+      try {
+        // Simulated data since we don't have a real backend
+        const stats = {
+          total_tasks: 42,
+          avg_execution_time: 1245.6,
+          sla_critical_percentage: 28.3
+        };
+        
+        document.getElementById('totalTasks').textContent = stats.total_tasks;
+        document.getElementById('avgTime').textContent = stats.avg_execution_time.toFixed(1);
+        document.getElementById('slaCritical').textContent = stats.sla_critical_percentage.toFixed(1) + '%';
+        
+        return stats;
+      } catch (error) {
+        console.error('Error loading stats:', error);
+      }
+    }
+
+    // Create sample task data for demonstration
+    function generateSampleTasks() {
+      const taskTypes = ['Compute', 'Storage', 'Network', 'Memory'];
+      const tasks = [];
+      
+      for (let i = 1; i <= 10; i++) {
+        tasks.push({
+          task_name: `Task ${i}`,
+          execution_time: Math.floor(Math.random() * 5000) + 500,
+          cpu_req: Math.floor(Math.random() * 15) + 1,
+          memory_req: Math.floor(Math.random() * 15000) + 100,
+          storage_req: Math.floor(Math.random() * 10000) + 100,
+          data_transfer_size: Math.floor(Math.random() * 1000),
+          priority: Math.floor(Math.random() * 5) + 1,
+          task_type: taskTypes[Math.floor(Math.random() * taskTypes.length)]
+        });
+      }
+      
+      return tasks;
+    }
+
+    // Create enhanced charts with sample data
+    function createCharts(tasks) {
+      // Priority Distribution Chart
+      const priorityCtx = document.getElementById('priorityChart').getContext('2d');
+      const priorityCounts = [0, 0, 0, 0, 0];
+      tasks.forEach(task => priorityCounts[task.priority - 1]++);
+      
+      new Chart(priorityCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Priority 1 (Highest)', 'Priority 2', 'Priority 3', 'Priority 4', 'Priority 5 (Lowest)'],
+          datasets: [{
+            data: priorityCounts,
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.7)',
+              'rgba(54, 162, 235, 0.7)',
+              'rgba(255, 206, 86, 0.7)',
+              'rgba(75, 192, 192, 0.7)',
+              'rgba(153, 102, 255, 0.7)'
+            ],
+            borderColor: [
+              'rgba(255, 99, 132, 1)',
+              'rgba(54, 162, 235, 1)',
+              'rgba(255, 206, 86, 1)',
+              'rgba(75, 192, 192, 1)',
+              'rgba(153, 102, 255, 1)'
+            ],
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'right',
+              labels: {
+                color: 'white',
+                font: {
+                  size: 12
+                }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `${context.label}: ${context.raw} tasks`;
+                }
+              }
+            }
+          },
+          cutout: '70%',
+          animation: {
+            animateScale: true,
+            animateRotate: true
+          }
+        }
+      });
+
+      // Execution Time Chart with gradient
+      const execCtx = document.getElementById('executionTimeChart').getContext('2d');
+      const labels = tasks.map(task => task.task_name);
+      const executionTimes = tasks.map(task => task.execution_time);
+      
+      // Create gradient
+      const gradient = execCtx.createLinearGradient(0, 0, 0, 400);
+      gradient.addColorStop(0, 'rgba(0, 245, 255, 0.8)');
+      gradient.addColorStop(1, 'rgba(188, 19, 254, 0.2)');
+      
+      new Chart(execCtx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Execution Time (ms)',
+            data: executionTimes,
+            backgroundColor: gradient,
+            borderColor: 'rgba(0, 245, 255, 1)',
+            borderWidth: 1,
+            borderRadius: 6,
+            borderSkipped: false
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                color: 'white'
+              },
+              grid: {
+                color: 'rgba(255, 255, 255, 0.1)'
+              }
+            },
+            x: {
+              ticks: {
+                color: 'white',
+                maxRotation: 45,
+                minRotation: 45
+              },
+              grid: {
+                color: 'rgba(255, 255, 255, 0.1)'
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              labels: {
+                color: 'white',
+                font: {
+                  size: 12
+                }
+              }
+            }
+          },
+          animation: {
+            delay: function(context) {
+              return context.dataIndex * 100;
+            }
+          }
+        }
+      });
+
+      // Resource Requirements Radar Chart with glow effect
+      const resourceCtx = document.getElementById('resourceChart').getContext('2d');
+      new Chart(resourceCtx, {
+        type: 'radar',
+        data: {
+          labels: ['CPU Cores', 'Memory (MB)', 'Storage (MB)', 'Data Transfer (MB)'],
+          datasets: [
+            {
+              label: 'Average Requirements',
+              data: [
+                tasks.reduce((sum, task) => sum + task.cpu_req, 0) / tasks.length,
+                tasks.reduce((sum, task) => sum + task.memory_req, 0) / tasks.length,
+                tasks.reduce((sum, task) => sum + task.storage_req, 0) / tasks.length,
+                tasks.reduce((sum, task) => sum + task.data_transfer_size, 0) / tasks.length
+              ],
+              backgroundColor: 'rgba(188, 19, 254, 0.2)',
+              borderColor: 'rgba(188, 19, 254, 1)',
+              borderWidth: 2,
+              pointBackgroundColor: 'rgba(188, 19, 254, 1)',
+              pointRadius: 4,
+              pointHoverRadius: 6
+            },
+            {
+              label: 'Maximum Requirements',
+              data: [
+                Math.max(...tasks.map(task => task.cpu_req)),
+                Math.max(...tasks.map(task => task.memory_req)),
+                Math.max(...tasks.map(task => task.storage_req)),
+                Math.max(...tasks.map(task => task.data_transfer_size))
+              ],
+              backgroundColor: 'rgba(0, 245, 255, 0.2)',
+              borderColor: 'rgba(0, 245, 255, 1)',
+              borderWidth: 2,
+              pointBackgroundColor: 'rgba(0, 245, 255, 1)',
+              pointRadius: 4,
+              pointHoverRadius: 6
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            r: {
+              angleLines: {
+                color: 'rgba(255, 255, 255, 0.1)'
+              },
+              grid: {
+                color: 'rgba(255, 255, 255, 0.1)'
+              },
+              pointLabels: {
+                color: 'white',
+                font: {
+                  size: 12
+                }
+              },
+              ticks: {
+                backdropColor: 'transparent',
+                color: 'white',
+                showLabelBackdrop: false
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              labels: {
+                color: 'white',
+                font: {
+                  size: 12
+                }
+              }
+            }
+          },
+          elements: {
+            line: {
+              tension: 0.3
+            }
+          }
+        }
+      });
+
+      // Task Type Chart with 3D effect
+      const typeCtx = document.getElementById('taskTypeChart').getContext('2d');
+      const typeCounts = {};
+      tasks.forEach(task => {
+        typeCounts[task.task_type] = (typeCounts[task.task_type] || 0) + 1;
+      });
+      
+      new Chart(typeCtx, {
+        type: 'pie',
+        data: {
+          labels: Object.keys(typeCounts),
+          datasets: [{
+            data: Object.values(typeCounts),
+            backgroundColor: [
+              'rgba(0, 245, 255, 0.7)',
+              'rgba(188, 19, 254, 0.7)',
+              'rgba(0, 184, 148, 0.7)',
+              'rgba(253, 203, 110, 0.7)'
+            ],
+            borderColor: [
+              'rgba(0, 245, 255, 1)',
+              'rgba(188, 19, 254, 1)',
+              'rgba(0, 184, 148, 1)',
+              'rgba(253, 203, 110, 1)'
+            ],
+            borderWidth: 2,
+            weight: 0.5
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'right',
+              labels: {
+                color: 'white',
+                font: {
+                  size: 12
+                },
+                padding: 20
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const label = context.label || '';
+                  const value = context.raw || 0;
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                  const percentage = Math.round((value / total) * 100);
+                  return `${label}: ${value} (${percentage}%)`;
+                }
+              }
+            }
+          },
+          animation: {
+            animateScale: true,
+            animateRotate: true
+          }
+        }
+      });
+
+      // Data Transfer Chart with smooth line
+      const dataCtx = document.getElementById('dataTransferChart').getContext('2d');
+      const transferSizes = tasks.map(task => task.data_transfer_size);
+      
+      // Create gradient for line chart
+      const lineGradient = dataCtx.createLinearGradient(0, 0, 0, 400);
+      lineGradient.addColorStop(0, 'rgba(0, 245, 255, 0.8)');
+      lineGradient.addColorStop(1, 'rgba(0, 245, 255, 0.1)');
+      
+      new Chart(dataCtx, {
+        type: 'line',
+        data: {
+          labels: tasks.map(task => task.task_name),
+          datasets: [{
+            label: 'Data Transfer Size (MB)',
+            data: transferSizes,
+            backgroundColor: lineGradient,
+            borderColor: 'rgba(0, 245, 255, 1)',
+            borderWidth: 2,
+            tension: 0.4,
+            fill: true,
+            pointBackgroundColor: 'rgba(0, 245, 255, 1)',
+            pointRadius: 4,
+            pointHoverRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                color: 'white'
+              },
+              grid: {
+                color: 'rgba(255, 255, 255, 0.1)'
+              }
+            },
+            x: {
+              ticks: {
+                color: 'white',
+                maxRotation: 45,
+                minRotation: 45
+              },
+              grid: {
+                color: 'rgba(255, 255, 255, 0.1)'
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              labels: {
+                color: 'white',
+                font: {
+                  size: 12
+                }
+              }
+            }
+          },
+          interaction: {
+            intersect: false,
+            mode: 'index'
+          }
+        }
+      });
+    }
+
+    // Handle analyze button click
+    document.getElementById('analyzeBtn').addEventListener('click', async function() {
+      const tasks = [];
+      
+      for (let i = 1; i <= 3; i++) {
+        const task = {};
+        let isValid = true;
+        
+        taskParameters.forEach(param => {
+          const value = parseFloat(document.getElementById(`${param.id}_${i}`).value);
+          if (isNaN(value)) {
+            alert(`Please enter a valid number for ${param.label} in Task ${i}`);
+            isValid = false;
+            return;
+          }
+          task[param.id] = value;
+        });
+        
+        if (!isValid) return;
+        tasks.push(task);
+      }
+      
+      try {
+        // Simulate API call with timeout
+        this.disabled = true;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Analyzing...';
+        
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // Generate mock predictions
+        const predictions = [];
+        for (let i = 0; i < tasks.length; i++) {
+          predictions.push({
+            priority: Math.floor(Math.random() * 5) + 1,
+            confidence: (Math.random() * 0.5 + 0.5).toFixed(2)
+          });
+        }
+        
+        const resultContainer = document.getElementById('resultContainer');
+        resultContainer.innerHTML = '';
+        
+        predictions.forEach((prediction, index) => {
+          const resultCard = document.createElement('div');
+          resultCard.className = `result-card priority-${prediction.priority}`;
+          
+          resultCard.innerHTML = `
+            <div class="result-title"><i class="fas fa-tasks me-2"></i>Task ${index + 1}</div>
+            <div class="stat-value">${prediction.priority}</div>
+            <div class="text-muted">Priority Level</div>
+            <div class="mt-2">
+              <small>Confidence: ${(prediction.confidence * 100).toFixed(1)}%</small>
+            </div>
+          `;
+          
+          resultContainer.appendChild(resultCard);
+        });
+        
+        // Update charts with new data
+        const sampleTasks = generateSampleTasks();
+        createCharts(sampleTasks);
+        
+      } catch (error) {
+        console.error('Analysis error:', error);
+        alert('Error during analysis. Please check console for details.');
+      } finally {
+        this.disabled = false;
+        this.innerHTML = '<i class="fas fa-bolt me-2"></i>Analyze Tasks';
+      }
+    });
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', async function() {
+      initializeTaskForms();
+      
+      // Load stats and sample data
+      await loadStats();
+      const tasks = generateSampleTasks();
+      
+      // Create initial charts
+      createCharts(tasks);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up | Cloud Task Scheduling</title>
+  <link rel="shortcut icon" href="http://127.0.0.1:5000/static/images/favicon.png" type="image/x-icon">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Orbitron:wght@500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Custom CSS -->
+  <style>
+    :root {
+      --primary: #6c5ce7;
+      --secondary: #00cec9;
+      --dark: #1a1a2e;
+      --light: #f5f6fa;
+      --accent: #00f5ff;
+      --gradient: linear-gradient(135deg, #6c5ce7 0%, #00cec9 100%);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Montserrat', sans-serif;
+      color: white;
+      background-color: var(--dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* Header */
+    header {
+      background: rgba(26, 26, 46, 0.9);
+      backdrop-filter: blur(10px);
+      padding: 15px 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: white;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+    }
+    
+    .logo i {
+      color: var(--accent);
+      margin-right: 10px;
+    }
+    
+    .nav-links {
+      display: flex;
+      list-style: none;
+    }
+    
+    .nav-links li {
+      margin-left: 30px;
+    }
+    
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--accent);
+      transition: width 0.3s ease;
+    }
+    
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+    
+    .nav-links a.active {
+      color: var(--accent);
+    }
+    
+    .menu-toggle {
+      display: none;
+      cursor: pointer;
+      font-size: 1.5rem;
+    }
+    
+    /* Hero Background */
+    .hero-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+    }
+    
+    .hero-bg::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(26, 26, 46, 0.85);
+      z-index: 1;
+    }
+    
+    .hero-bg img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+    
+    /* Main Content */
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 100px 5% 50px;
+    }
+    
+    .auth-container {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 500px;
+      padding: 40px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      transform: translateY(0);
+      transition: all 0.3s ease;
+    }
+    
+    .auth-container:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+    
+    .auth-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    
+    .auth-header h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2rem;
+      margin-bottom: 15px;
+      color: var(--accent);
+    }
+    
+    .auth-header p {
+      opacity: 0.8;
+    }
+    
+    .form-group {
+      margin-bottom: 25px;
+      position: relative;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 15px 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      color: white;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0, 245, 255, 0.2);
+    }
+    
+    .password-container {
+      position: relative;
+    }
+    
+    .password-toggle {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: rgba(255, 255, 255, 0.5);
+      transition: all 0.3s ease;
+    }
+    
+    .password-toggle:hover {
+      color: var(--accent);
+    }
+    
+    .btn {
+      display: inline-block;
+      width: 100%;
+      padding: 15px;
+      border-radius: 10px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      text-align: center;
+      cursor: pointer;
+      border: none;
+      font-size: 1rem;
+    }
+    
+    .btn-primary {
+      background: var(--gradient);
+      color: white;
+      box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(108, 92, 231, 0.5);
+    }
+    
+    .auth-footer {
+      text-align: center;
+      margin-top: 30px;
+    }
+    
+    .auth-footer a {
+      color: var(--accent);
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+    
+    .auth-footer a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Password Strength Meter */
+    .password-strength {
+      height: 5px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 5px;
+      margin-top: 10px;
+      overflow: hidden;
+    }
+    
+    .strength-meter {
+      height: 100%;
+      width: 0;
+      background: var(--danger);
+      transition: all 0.3s ease;
+    }
+    
+    /* Contact Info */
+    .contact-info {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin-top: 50px;
+      flex-wrap: wrap;
+      padding: 20px 5%;
+      background: rgba(0, 0, 0, 0.2);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .contact-item i {
+      color: var(--accent);
+      font-size: 1.2rem;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .menu-toggle {
+        display: block;
+      }
+      
+      .nav-links {
+        position: fixed;
+        top: 70px;
+        left: -100%;
+        width: 100%;
+        height: calc(100vh - 70px);
+        background: var(--dark);
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.5s ease;
+      }
+      
+      .nav-links.active {
+        left: 0;
+      }
+      
+      .nav-links li {
+        margin: 15px 0;
+      }
+      
+      .auth-container {
+        padding: 30px 20px;
+      }
+    }
+    
+    /* Animations */
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    .floating {
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    /* Alert Message */
+    .alert {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 25px;
+      background: rgba(214, 48, 49, 0.9);
+      color: white;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      transform: translateX(200%);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+    }
+    
+    .alert.show {
+      transform: translateX(0);
+    }
+    
+    .alert.success {
+      background: rgba(0, 184, 148, 0.9);
+    }
+  </style>
+</head>
+<body>
+  <!-- Background Animation -->
+  <div class="hero-bg">
+    <img src="https://americanlean.com/wp-content/uploads/2020/03/giphy4.gif" alt="Cloud computing background">
+  </div>
+  
+  <!-- Header -->
+  <header>
+    <a href="/" class="logo">
+      <i class="fas fa-cloud"></i> CLOUD SCHEDULER
+    </a>
+    
+    <div class="menu-toggle" id="menuToggle">
+      <i class="fas fa-bars"></i>
+    </div>
+    
+    <ul class="nav-links" id="navLinks">
+      <li><a href="/">Home</a></li>
+      <li><a href="/signin">Sign In</a></li>
+      <li><a href="/signup" class="active">Sign Up</a></li>
+    </ul>
+  </header>
+  
+  <!-- Main Content -->
+  <main>
+    <div class="auth-container floating">
+      <div class="auth-header">
+        <h2>Create Account</h2>
+        <p>Join our cloud task scheduling platform today</p>
+      </div>
+      
+      <form action="/signup" method="post">
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" name="name" class="form-control" placeholder="Enter your full name" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="phone">Phone Number</label>
+          <input type="tel" id="phone" name="phone" class="form-control" placeholder="Enter your phone number" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="password-container">
+            <input type="password" id="password" name="password" class="form-control" placeholder="Create a password" required>
+            <i class="fas fa-eye password-toggle" id="togglePassword"></i>
+          </div>
+          <div class="password-strength">
+            <div class="strength-meter" id="strengthMeter"></div>
+          </div>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Sign Up</button>
+        
+        <div class="auth-footer">
+          <p>Already have an account? <a href="/signin">Sign in here</a></p>
+        </div>
+      </form>
+    </div>
+  </main>
+  
+  <!-- Contact Info -->
+  <div class="contact-info">
+    <div class="contact-item">
+      <i class="fas fa-map-marker-alt"></i>
+      <span>ABC, Bangalore</span>
+    </div>
+    <div class="contact-item">
+      <i class="fas fa-phone"></i>
+      <span>+91 72040-36555</span>
+    </div>
+    <div class="contact-item">
+      <i class="fas fa-globe"></i>
+      <span>https://www.ABC.ac.in/</span>
+    </div>
+  </div>
+  
+  <!-- JavaScript -->
+  <script>
+    // Mobile Menu Toggle
+    const menuToggle = document.getElementById('menuToggle');
+    const navLinks = document.getElementById('navLinks');
+    
+    menuToggle.addEventListener('click', () => {
+      navLinks.classList.toggle('active');
+    });
+    
+    // Password Toggle Visibility
+    const togglePassword = document.getElementById('togglePassword');
+    const password = document.getElementById('password');
+    
+    togglePassword.addEventListener('click', () => {
+      const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+      password.setAttribute('type', type);
+      togglePassword.classList.toggle('fa-eye');
+      togglePassword.classList.toggle('fa-eye-slash');
+    });
+    
+    // Password Strength Meter
+    password.addEventListener('input', function() {
+      const strengthMeter = document.getElementById('strengthMeter');
+      const strength = calculatePasswordStrength(this.value);
+      
+      // Update meter width and color
+      strengthMeter.style.width = `${strength.percentage}%`;
+      
+      if (strength.score < 2) {
+        strengthMeter.style.background = '#d63031'; // Weak (red)
+      } else if (strength.score < 4) {
+        strengthMeter.style.background = '#fdcb6e'; // Medium (yellow)
+      } else {
+        strengthMeter.style.background = '#00b894'; // Strong (green)
+      }
+    });
+    
+    function calculatePasswordStrength(password) {
+      let score = 0;
+      
+      // Length
+      if (password.length > 0) score += 1;
+      if (password.length >= 8) score += 1;
+      
+      // Complexity
+      if (/[A-Z]/.test(password)) score += 1;
+      if (/[0-9]/.test(password)) score += 1;
+      if (/[^A-Za-z0-9]/.test(password)) score += 1;
+      
+      // Calculate percentage (max score is 5)
+      const percentage = (score / 5) * 100;
+      
+      return { score, percentage };
+    }
+    
+    // Show alert message if exists
+    const msg = '{{msg}}';
+    if(msg) {
+      const alertDiv = document.createElement('div');
+      alertDiv.className = `alert ${msg.includes('Success') ? 'success' : ''} show`;
+      alertDiv.textContent = msg;
+      document.body.appendChild(alertDiv);
+      
+      setTimeout(() => {
+        alertDiv.classList.remove('show');
+        setTimeout(() => {
+          alertDiv.remove();
+        }, 300);
+      }, 5000);
+    }
+    
+    // Floating animation for auth container
+    const authContainer = document.querySelector('.auth-container');
+    window.addEventListener('scroll', () => {
+      const scrollPosition = window.scrollY;
+      authContainer.style.transform = `translateY(${scrollPosition * 0.1}px)`;
+    });
+  </script>
+</body>
+</html>

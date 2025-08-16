@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cloud Task Scheduling | AI-Powered Predictions</title>
+  <link rel="shortcut icon" href="http://127.0.0.1:5000/static/images/favicon.png" type="image/x-icon">
+  
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
+  
+  <!-- Animate.css -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  
+  <!-- Gradient Backgrounds -->
+  <style>
+    :root {
+      --primary: #6c5ce7;
+      --secondary: #00cec9;
+      --accent: #00f5ff;
+      --danger: #ff3e6d;
+      --success: #00e676;
+      --warning: #ffaa00;
+      --dark: #1a1a2e;
+      --light: #f8f9fa;
+      --gradient-bg: linear-gradient(135deg, #667eea, #764ba2);
+      --gradient-btn: linear-gradient(135deg, #6a11cb, #2575fc);
+      --gradient-card: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.95));
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--gradient-bg);
+      color: white;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
+    /* **Animated Floating Particles Background** */
+    .particles-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      background: var(--gradient-bg);
+      overflow: hidden;
+    }
+    
+    .particle {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 50%;
+      pointer-events: none;
+      animation: float 15s infinite linear;
+    }
+    
+    @keyframes float {
+      0% { transform: translateY(0) rotate(0deg); }
+      100% { transform: translateY(-100vh) rotate(360deg); }
+    }
+    
+    /* **Glassmorphism UI Elements** */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+    }
+    
+    .glass-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* **Neon Glow Effects** */
+    .neon-text {
+      text-shadow: 0 0 10px rgba(0, 245, 255, 0.7);
+    }
+    
+    /* **3D Button with Hover Effect** */
+    .btn-neon {
+      background: var(--gradient-btn);
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      font-weight: 600;
+      border-radius: 50px;
+      box-shadow: 0 5px 15px rgba(106, 17, 203, 0.4);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn-neon:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(106, 17, 203, 0.6);
+    }
+    
+    .btn-neon:active {
+      transform: translateY(1px);
+    }
+    
+    /* **Task Priority Badges** */
+    .priority-high {
+      background: linear-gradient(135deg, #ff3e6d, #ff6b6b);
+      color: white;
+    }
+    
+    .priority-medium {
+      background: linear-gradient(135deg, #ffaa00, #ffcc00);
+      color: white;
+    }
+    
+    .priority-low {
+      background: linear-gradient(135deg, #00e676, #00c853);
+      color: white;
+    }
+    
+    /* **Pulse Animation for Urgent Tasks** */
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(255, 62, 109, 0.7); }
+      70% { box-shadow: 0 0 0 15px rgba(255, 62, 109, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 62, 109, 0); }
+    }
+    
+    .urgent-task {
+      animation: pulse 2s infinite;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- **Animated Particle Background** -->
+  <div class="particles-bg" id="particles-js"></div>
+  
+  <!-- **Navigation Bar (Glassmorphism Design)** -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="/">
+        <i class="fas fa-cloud me-2"></i>CLOUD SCHEDULER
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link active" href="/predict"><i class="fas fa-chart-line me-1"></i> Predict</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/analysis"><i class="fas fa-tasks me-1"></i> Analysis</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
+          </li>
+        </ul>
+        <a href="/analysis" class="btn btn-neon ms-3">
+          <i class="fas fa-rocket me-1"></i> Open Analysis
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- **Hero Section (Gradient Background + Floating Animation)** -->
+  <section class="py-5">
+    <div class="container py-5">
+      <div class="row align-items-center">
+        <div class="col-lg-8 mx-auto text-center animate__animated animate__fadeInDown">
+          <h1 class="display-4 fw-bold mb-4 neon-text">AI-Powered Task Prediction</h1>
+          <p class="lead mb-4">Optimize cloud resources with intelligent scheduling</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- **Prediction Dashboard (Glass Cards)** -->
+  <div class="container py-4">
+    {% if ct %}
+    <!-- **Results Display (Animated Cards)** -->
+    <div class="row g-4 mb-5">
+      <div class="col-md-4 animate__animated animate__fadeInLeft">
+        <div class="glass-card p-4 text-center h-100">
+          <i class="fas fa-clock fa-3x mb-3" style="color: var(--accent);"></i>
+          <h3 class="fw-bold">{{ct}} Mins</h3>
+          <p class="mb-0">Charging Time</p>
+        </div>
+      </div>
+      <div class="col-md-4 animate__animated animate__fadeInUp">
+        <div class="glass-card p-4 text-center h-100">
+          <i class="fas fa-road fa-3x mb-3" style="color: var(--success);"></i>
+          <h3 class="fw-bold">{{rull}} KMS</h3>
+          <p class="mb-0">Travel Distance</p>
+        </div>
+      </div>
+      <div class="col-md-4 animate__animated animate__fadeInRight">
+        <div class="glass-card p-4 text-center h-100">
+          <i class="fas fa-calendar-alt fa-3x mb-3" style="color: var(--warning);"></i>
+          <h3 class="fw-bold">{{rdis}} Days</h3>
+          <p class="mb-0">Remaining Days</p>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- **Prediction Form (Glowing Button)** -->
+    <div class="glass-card p-5 mb-5 animate__animated animate__zoomIn">
+      <div class="text-center">
+        <h2 class="fw-bold mb-4"><i class="fas fa-magic me-2"></i>Run AI Prediction</h2>
+        <form id="analysisForm" action="{{ url_for('predict') }}" method="POST">
+          <button type="submit" class="btn-neon btn-lg">
+            <i class="fas fa-brain me-2"></i>Analyze Tasks
+          </button>
+        </form>
+      </div>
+    </div>
+
+    {% if tasks %}
+    <!-- **Task Priority Dashboard (Color-Coded)** -->
+    <div class="glass-card p-5 animate__animated animate__fadeInUp">
+      <h2 class="fw-bold text-center mb-5"><i class="fas fa-list-ol me-2"></i>Task Priority Dashboard</h2>
+      
+      <!-- **Priority Alert (Animated)** -->
+      <div class="alert alert-warning animate__animated animate__shakeX">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <strong>Priority Alert!</strong> The highlighted task requires immediate attention.
+      </div>
+      
+      <div class="row g-4">
+        {% for task in tasks %}
+        <div class="col-md-4">
+          <div class="glass-card p-4 h-100 {% if task.is_immediate %}urgent-task{% endif %}">
+            {% if task.is_immediate %}
+            <span class="badge priority-high mb-3">URGENT</span>
+            {% else %}
+            <span class="badge priority-low mb-3">OPTIMIZED</span>
+            {% endif %}
+            
+            <h4 class="fw-bold"><i class="fas fa-tasks me-2"></i>Task {{ loop.index }}</h4>
+            
+            <div class="mb-3">
+              <small class="text-muted">{{ task.col1.name }}:</small>
+              <p class="fw-bold">{{ task.col1.value }}</p>
+            </div>
+            
+            <div class="mb-3">
+              <small class="text-muted">{{ task.col2.name }}:</small>
+              <p class="fw-bold">{{ task.col2.value }}</p>
+            </div>
+            
+            <div class="mb-3">
+              <small class="text-muted">{{ task.col3.name }}:</small>
+              <p class="fw-bold {% if task.is_immediate %}text-danger{% endif %}">{{ task.col3.value }}</p>
+            </div>
+            
+            <div class="mb-3">
+              <small class="text-muted">{{ task.col4.name }}:</small>
+              <p class="fw-bold">{{ task.col4.value }}</p>
+            </div>
+            
+            <div>
+              <small class="text-muted">{{ task.col5.name }}:</small>
+              <p class="fw-bold">{{ task.col5.value }}</p>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- **Footer (Gradient Background)** -->
+  <footer class="py-5 mt-5" style="background: rgba(0, 0, 0, 0.2);">
+    <div class="container text-center">
+      <p class="mb-0">&copy; 2023 Cloud Task Scheduling. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- **Bootstrap JS** -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- **Particle.js for Floating Background** -->
+  <script>
+    // Create floating particles
+    document.addEventListener('DOMContentLoaded', function() {
+      const particlesContainer = document.getElementById('particles-js');
+      const particleCount = 50;
+      
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.classList.add('particle');
+        
+        // Random size & position
+        const size = Math.random() * 10 + 2;
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        particle.style.left = `${Math.random() * 100}%`;
+        particle.style.top = `${Math.random() * 100}%`;
+        
+        // Random opacity & animation delay
+        particle.style.opacity = Math.random() * 0.5 + 0.1;
+        particle.style.animationDelay = `${Math.random() * 5}s`;
+        
+        particlesContainer.appendChild(particle);
+      }
+    });
+  </script>
+</body>
+</html>
